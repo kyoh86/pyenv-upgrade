@@ -24,10 +24,11 @@ var (
 )
 
 func main() {
+	var verbose bool
 	app := kingpin.New("pyenv-upgrade", "Upgrade all pyenv-envs").Version(version).Author("kyoh86")
+	app.Flag("verbose", "show verbose logs").BoolVar(&verbose)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	verbose := true
 	locals := localVersions(verbose)
 	remoteLatests := remoteLatestVersions(verbose)
 
@@ -74,6 +75,7 @@ func main() {
 			}
 		}
 	}
+	fmt.Println("done")
 }
 
 type semantic struct {
