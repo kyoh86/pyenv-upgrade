@@ -1,47 +1,57 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+
 project_name: pyenv-upgrade
-release:
-  github:
-    owner: kyoh86
-    name: pyenv-upgrade
-brews:
-- install: |
-    bin.install "pyenv-upgrade"
-    man1.install "pyenv-upgrade.1"
-  github:
-    owner: kyoh86
-    name: homebrew-tap
-  folder: Formula
-  homepage: https://github.com/kyoh86/pyenv-upgrade
-  description: Upgrade all pyenv-envs
 builds:
-- goos:
-  - linux
-  - darwin
-  - windows
-  goarch:
-  - amd64
-  - "386"
-  main: .
-  ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
-  binary: pyenv-upgrade
-  hooks:
-    pre: make man
+  - id: default
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+      - "386"
+    main: .
+    binary: pyenv-upgrade
+    ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+    hooks:
+      post:
+        - make man VERSION={{.Version}} COMMIT={{.ShortCommit}} DATE={{.Date}}
+brews:
+  - install: |
+      bin.install "pyenv-upgrade"
+      man1.install Dir.glob('pyenv-upgrade*.1')
+    tap:
+      owner: kyoh86
+      name: homebrew-tap
+    folder: Formula
+    homepage: https://github.com/kyoh86/pyenv-upgrade
+    description: Upgrade all pyenv-envs
+    license: MIT
+nfpms:
+  - builds:
+      - default
+    maintainer: kyoh86 <me@kyoh86.dev>
+    homepage: https://github.com/kyoh86/pyenv-upgrade
+    description: Upgrade all pyenv-envs
+    license: MIT
+    formats:
+      - apk
+      - deb
+      - rpm
 archives:
-- id: gzip
-  format: tar.gz
-  format_overrides:
-    - goos: windows
-      format: zip
-  name_template: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-  files:
-  - licence*
-  - LICENCE*
-  - license*
-  - LICENSE*
-  - readme*
-  - README*
-  - changelog*
-  - CHANGELOG*
-  - pyenv-upgrade.1
-snapshot:
-  name_template: SNAPSHOT-{{ .Commit }}
+  - id: gzip
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - licence*
+      - LICENCE*
+      - license*
+      - LICENSE*
+      - readme*
+      - README*
+      - changelog*
+      - CHANGELOG*
+      - pyenv-upgrade.1
